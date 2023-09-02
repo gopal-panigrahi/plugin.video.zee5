@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.zee5" version="1.0.0" name="ZEE5" provider-name="Vàjrà">
+	<requires>
+		<import addon="xbmc.python" version="3.0.0" />
+		<import addon="script.module.codequick" version="1.0.3" />
+		<import addon="script.module.inputstreamhelper" version="0.6.1" />
+	</requires>
+	<extension point="xbmc.python.pluginsource" library="addon.py">
+		<provides>video</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary>ZEE5 is a one stop destination for Audio/Video content from Zee Entertainment Enterprises Limited.</summary>
+		<description>ZEE5 is an Indian subscription video on-demand and over-the-top streaming service, run by Zee Entertainment Enterprises Limited.</description>
+		<platform>all</platform>
+		<website>https://www.zee5.com/</website>
+		<disclaimer>This 3rd party addon is not in any way commissioned or endorsed by Zee Entertainment Enterprises Limited.</disclaimer>
+		<assets>
+			<icon>icon.png</icon>
+			<fanart>fanart.png</fanart>
+		</assets>
+	</extension>
+</addon>

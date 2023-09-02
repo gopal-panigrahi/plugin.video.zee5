@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="General">
+		<setting id="cleanup" type="action" label="Clear Cache" action="RunPlugin(plugin://plugin.video.zee5/resources/lib/main/cleanup/)" option="close" />
+		<setting id="device_id" type="text" label="Device ID" default="DefSLXVfnFJol4MvPpsp000000000000" enable="false" />
+		<setting id="deviceidgen" type="action" label="Generate New Device ID" action="RunPlugin(plugin://plugin.video.zee5/resources/lib/main/generate_deviceid/)" />
+	</category>
+</settings>
