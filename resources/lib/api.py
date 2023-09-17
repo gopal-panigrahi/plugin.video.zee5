@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
-from resources.lib.utils import updateQueryParams
+from resources.lib.utils import updateQueryParams, deep_get
 import urlquick
-from resources.lib.constants import BASE_HEADERS, DEVICE_ID, url_constructor
+from resources.lib.constants import URLS, BASE_HEADERS, DEVICE_ID, url_constructor
 from codequick import Script
 import re
 import requests
@@ -27,6 +27,26 @@ class Zee5API:
             if t != "":
                 token = t
         return token
+
+    def getPage(self, id, page):
+        payload = json.dumps(
+            {
+                "query": "\n  query ($id: ID!, $filter: CollectionFilter) {\n    collection(id: $id, filter: $filter) {\n      id\n      title\n      originalTitle\n      tags\n      rails {\n        id\n        title\n        originalTitle\n        tags\n        position\n        contents {\n          ... on Episode {\n            id\n            title\n            originalTitle\n            duration\n            upcomingContent\n            contentOwner\n            businessType\n            eventStartDate\n            genres {\n              id\n              value\n            }\n            languages\n            description\n            assetType\n            assetSubType\n            releaseDate\n            viewCount {\n              formattedCount\n              count\n            }\n            image {\n              list\n              cover\n              appCover\n              sticker\n              svodCover\n              verticalBanner\n              appSvodCover\n            }\n            actors\n            ageRating\n            audioLanguages\n            subtitleLanguages\n            eventLive\n            tags\n            episodeNumber\n            billingType\n            tier\n            seoTitle\n            slug\n            webUrl\n            rating\n            tvShow {\n              id\n              title\n              originalTitle\n              assetSubType\n            }\n            contentPartner {\n              id\n              name\n              image {\n                rectangleDarkLogo\n                rectangleWhiteLogo\n                circleDarkLogo\n                circleWhiteLogo\n              }\n            }\n          }\n          ... on Movie {\n            id\n            title\n            originalTitle\n            duration\n            contentOwner\n            businessType\n            genres {\n              id\n              value\n            }\n            languages\n            description\n            assetType\n            assetSubType\n            releaseDate\n            viewCount {\n              formattedCount\n              count\n            }\n            image {\n              list\n              cover\n              sticker\n              appCover\n              svodCover\n              verticalBanner\n              appSvodCover\n            }\n            actors\n            ageRating\n            audioLanguages\n            subtitleLanguages\n            eventLive\n            tags\n            billingType\n            tier\n            playDate\n            seoTitle\n            slug\n            webUrl\n            rating\n            relatedContentIds {\n              id\n            }\n            contentPartner {\n              id\n              name\n              image {\n                rectangleDarkLogo\n                rectangleWhiteLogo\n                circleDarkLogo\n                circleWhiteLogo\n              }\n            }\n          }\n        }\n        totalResults\n      }\n      page\n      size\n      totalResults\n    }\n  }\n",
+                "variables": {
+                    "id": id,
+                    "filter": {
+                        "page": page,
+                        "translation": "en",
+                        "languages": "en,hi,mr",
+                        "country": "IN",
+                        "limit": 20,
+                        "itemLimit": 10,
+                    },
+                },
+            }
+        )
+        resp = self.post(URLS.get("PAGE"), data=payload)
+        return deep_get(resp, "data.collection")
 
     def getCollection(self, url):
         resp = self.get(url)

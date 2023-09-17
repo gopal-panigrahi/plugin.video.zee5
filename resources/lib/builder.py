@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from resources.lib.utils import get_images, callback_urls
+from resources.lib.utils import get_images, callback_urls, deep_get, isPremium
 from resources.lib.constants import MAIN_MENU
 from codequick import Listitem, Resolver, Route
 import inputstreamhelper
@@ -13,7 +13,7 @@ class Builder:
             item_data = {
                 "callback": Route.ref("/resources/lib/main:list_collection"),
                 "label": item_name,
-                "params": {"collection_id": id},
+                "params": {"id": id, "start": 0, "end": 20},
             }
             item = Listitem.from_dict(**item_data)
             item.art.local_thumb(image)
@@ -21,49 +21,39 @@ class Builder:
 
     def buildCollection(self, items):
         for each in items:
-            if each.get("asset_subtype") in ["tvshow", "movie", "original"]:
-                thumb, fanart = get_images(each)
+            if each.get("title") and "Banner" not in each.get("title"):
+                thumb, fanart = get_images(each.get("contents")[0])
                 item_data = {
-                    "callback": callback_urls.get(each.get("asset_subtype")),
+                    "callback": Route.ref("/resources/lib/main:list_page"),
                     "label": each.get("title"),
                     "art": {"thumb": thumb, "fanart": fanart},
-                    "info": {
-                        "genre": [genre for _, genre in each.get("genre")],
-                        "mpaa": each.get("age_rating"),
-                        "plot": each.get("description"),
-                        "plotoutline": each.get("short_description"),
-                        "mediatype": each.get("asset_subtype"),
-                        "castandrole": [
-                            castandrole.split(":") for castandrole in each.get("actors")
-                        ],
-                    },
-                    "params": {
-                        "mediatype": each.get("asset_subtype"),
-                        "item_id": each.get("id"),
-                    },
+                    "params": {"id": each.get("id"), "start": 0, "end": 20},
                 }
                 yield Listitem.from_dict(**item_data)
 
     def buildPage(self, items):
         for each in items:
+            premium = isPremium(each)
             thumb, fanart = get_images(each)
             item_data = {
-                "callback": Route.ref("/resources/lib/main:list_episodes"),
-                "label": each.get("title"),
+                "callback": callback_urls.get(each.get("assetSubType")),
+                "label": f'{each.get("title")} {premium}',
                 "art": {"thumb": thumb, "fanart": fanart},
                 "info": {
-                    "genre": [genre for _, genre in each.get("genre")],
-                    "mpaa": each.get("age_rating"),
+                    "genre": [genre for _, genre in each.get("genre", [])],
+                    "mpaa": each.get("ageRating"),
                     "plot": each.get("description"),
-                    "plotoutline": each.get("short_description"),
-                    "mediatype": each.get("asset_subtype"),
+                    "mediatype": each.get("assetSubType"),
                     "castandrole": [
-                        castandrole.split(":") for castandrole in each.get("actors")
+                        castandrole.split(":") for castandrole in each.get("actors", [])
                     ],
                 },
                 "params": {
-                    "url": f"tvshow/{each.get('id')}",
-                    "show_id": each.get("id"),
+                    "mediatype": each.get("assetSubType"),
+                    "item_id": each.get("id"),
+                    "show_id": deep_get(each, "tvShow.id"),
+                    "start": 0,
+                    "end": 20,
                 },
             }
             yield Listitem.from_dict(**item_data)
@@ -83,6 +73,12 @@ class Builder:
             item.art.local_thumb("season.png")
             yield item
 
+    def buildNext(self, **kwargs):
+        if kwargs.get("end") < kwargs.get("total"):
+            kwargs["start"] += 20
+            kwargs["end"] += 20
+            yield Listitem().next_page(**kwargs)
+
     def buildEpisodes(self, episodes, show_id):
         for each in episodes:
             if each.get("business_type").split("_")[0] not in ["premium"]:
@@ -95,7 +91,7 @@ class Builder:
                     },
                     "info": {
                         "mpaa": each.get("age_rating"),
-                        "genre": [genre for _, genre in each.get("genre")],
+                        "genre": [genre for _, genre in each.get("genre", [])],
                         "plot": each.get("description"),
                         "plotoutline": each.get("description"),
                         "episode": each.get("episode_number"),

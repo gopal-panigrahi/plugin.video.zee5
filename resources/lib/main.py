@@ -17,26 +17,22 @@ def root(_):
 
 @Route.register
 def list_collection(_, **kwargs):
-    if "collection_id" in kwargs:
-        url = url_constructor(kwargs.get("collection_id"))
-        page = kwargs.get("page", 1)
-        queryParams = {
-            "page": page,
-            "languages": "en,hi,mr",
-            "item_limit": "20",
-            "version": "10",
-        }
-        queryParams.update(DEFAULT_PARAMS)
-        url = updateQueryParams(url, queryParams)
-        collection, total = api.getCollection(url)
-        yield from builder.buildCollection(collection)
-        if page * 24 < total:
-            yield Listitem.next_page(
-                **{
-                    "page": kwargs.get("page", 1) + 1,
-                    "collection_id": kwargs.get("collection_id"),
-                }
-            )
+    if "id" in kwargs:
+        page = api.getPage(kwargs.get("id"), kwargs.get("end") // 20)
+        kwargs["total"] = page.get("totalResults")
+        yield from builder.buildCollection(page.get("rails"))
+        yield from builder.buildNext(**kwargs)
+    else:
+        return False
+
+
+@Route.register
+def list_page(_, **kwargs):
+    if "id" in kwargs:
+        page = api.getPage(kwargs.get("id"), kwargs.get("end") // 20)
+        kwargs["total"] = page.get("totalResults")
+        yield from builder.buildPage(page.get("rails")[0].get("contents"))
+        yield from builder.buildNext(**kwargs)
     else:
         return False
 
