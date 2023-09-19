@@ -44,9 +44,6 @@ class Builder:
                     "mpaa": each.get("ageRating"),
                     "plot": each.get("description"),
                     "mediatype": each.get("assetSubType"),
-                    "castandrole": [
-                        castandrole.split(":") for castandrole in each.get("actors", [])
-                    ],
                 },
                 "params": {
                     "mediatype": each.get("assetSubType"),

@@ -48,6 +48,26 @@ class Zee5API:
         resp = self.post(URLS.get("PAGE"), data=payload)
         return deep_get(resp, "data.collection")
 
+    def getSearchResult(self, keyword):
+        payload = json.dumps(
+            {
+                "query": "\nquery ($searchQueryInput: SearchQueryInput!) {\n    searchResults(searchQueryInput: $searchQueryInput) {\n      __typename\n      totalPages\n      currentPageIndex\n      totalResultsCount\n      currentResultsCount\n      limit\n      version\n      queryId\n      results {\n        title\n        duration\n        businessType\n        originalTitle\n        assetSubType\n        isIndiaImageEnabled\n        releaseDate\n        contentType\n        primaryGenre\n        audioLanguages\n        id\n        billingType\n        listImage\n        coverImage\n        imageUrl\n        subtitleLanguages\n        image {\n          listClean\n          square\n          appCover\n          tvCover\n          cover\n          list\n          portraitClean\n          portrait\n        }\n        genre {\n          id\n          value\n        }\n        actors\n        tvShow {\n          id\n          title\n          originalTitle\n          assetSubType\n        }\n      }\n    }\n  }\n",
+                "variables": {
+                    "searchQueryInput": {
+                        "query": keyword,
+                        "limit": 24,
+                        "page": 0,
+                        "country": "IN",
+                        "filters": {},
+                        "languages": "en,hi,mr",
+                        "translation": "en",
+                    },
+                },
+            }
+        )
+        resp = self.post(URLS.get("PAGE"), data=payload)
+        return deep_get(resp, "data.searchResults.results")
+
     def getCollection(self, url):
         resp = self.get(url)
         collection = resp and resp.get("buckets")[0].get("items")
@@ -78,9 +98,18 @@ class Zee5API:
             "sec-ch-ua-platform": '"Linux"',
         }
 
-        response = requests.request("POST", url, headers=headers, data=payload).json()
+        response = self.raw_post(url, headers, payload)
 
         return response.get("keyOsDetails"), response.get("assetDetails")
+
+    def raw_post(self, url, headers, payload):
+        try:
+            response = requests.request("POST", url, headers=headers, data=payload)
+            if response.status_code == 401:
+                Script.notify("Login Error", "Please login to continue")
+            return response.json()
+        except Exception as e:
+            return self._handleError(e, url, "post")
 
     def get(self, url, **kwargs):
         try:

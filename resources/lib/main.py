@@ -12,6 +12,7 @@ import random, string
 
 @Route.register
 def root(_):
+    yield Listitem.search(Route.ref("/resources/lib/main:list_search"), url="search")
     yield from builder.buildMenu()
 
 
@@ -24,6 +25,16 @@ def list_collection(_, **kwargs):
         yield from builder.buildNext(**kwargs)
     else:
         return False
+
+
+@Route.register
+def list_search(_, **kwargs):
+    if kwargs.get("search_query", False):
+        keyword = kwargs.get("search_query")
+        items = api.getSearchResult(keyword)
+        yield from builder.buildPage(items)
+    else:
+        yield False
 
 
 @Route.register
