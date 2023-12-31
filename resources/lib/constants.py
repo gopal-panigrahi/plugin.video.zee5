@@ -16,6 +16,7 @@ else:
 BASE_HEADERS = headers = {
     "Referer": "https://www.google.com/",
     "User-Agent": USER_AGENT,
+    "Content-Type": "application/json",
 }
 
 url_constructor = urljoin_partial(CONTENT_BASE_URL)

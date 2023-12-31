@@ -40,7 +40,7 @@ class Zee5API:
                         "languages": "en,hi,mr",
                         "country": "IN",
                         "limit": 20,
-                        "itemLimit": 10,
+                        "itemLimit": 5,
                     },
                 },
             }
