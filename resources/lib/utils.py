@@ -60,6 +60,29 @@ def is_premium(item):
     return ""
 
 
+def get_languages():
+    LANG = {
+        "Hindi": "hi",
+        "English": "en",
+        "Marathi": "mr",
+        "Telugu": "te",
+        "Kannada": "kn",
+        "Tamil": "ta",
+        "Malayalam": "ml",
+        "Bengali": "bn",
+        "Gujarati": "gu",
+        "Punjabi": "pa",
+        "Bhojpuri": "hr",
+        "Oriya": "or",
+    }
+
+    languages = []
+    for lang in LANG:
+        if Settings.get_boolean(lang):
+            languages.append(LANG[lang])
+    return ",".join(languages)
+
+
 callback_urls = {
     "movie": Resolver.ref("/resources/lib/main:play_video"),
     "external_link": Resolver.ref("/resources/lib/main:play_video"),

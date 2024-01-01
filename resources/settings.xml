@@ -5,4 +5,18 @@
 		<setting id="device_id" type="text" label="Device ID" default="DefSLXVfnFJol4MvPpsp000000000000" enable="false" />
 		<setting id="deviceidgen" type="action" label="Generate New Device ID" action="RunPlugin(plugin://plugin.video.zee5/resources/lib/main/generate_deviceid/)" />
 	</category>
+	<category label="Languages">
+        <setting id="Hindi" type="bool" label="Hindi" default="true"/>
+        <setting id="English" type="bool" label="English" default="true"/>
+        <setting id="Oriya" type="bool" label="Oriya" default="false"/>
+        <setting id="Marathi" type="bool" label="Marathi" default="false"/>
+        <setting id="Telugu" type="bool" label="Telugu" default="false"/>
+        <setting id="Kannada" type="bool" label="Kannada" default="false"/>
+        <setting id="Tamil" type="bool" label="Tamil" default="false"/>
+        <setting id="Malayalam" type="bool" label="Malayalam" default="false"/>
+        <setting id="Bengali" type="bool" label="Bengali" default="false"/>
+        <setting id="Gujarati" type="bool" label="Gujarati" default="false"/>
+        <setting id="Punjabi" type="bool" label="Punjabi" default="false"/>
+        <setting id="Bhojpuri" type="bool" label="Bhojpuri" default="false"/>
+    </category>
 </settings>

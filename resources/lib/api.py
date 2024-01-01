@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from resources.lib.utils import update_query_params, deep_get
+from resources.lib.utils import update_query_params, deep_get, get_languages
 import urlquick
 from resources.lib.constants import URLS, BASE_HEADERS, DEVICE_ID, url_constructor
 from codequick import Script
@@ -16,6 +16,7 @@ class Zee5API:
         self.session.headers.update(
             {"x-access-token": self.token, "Referer": "https://www.zee5.com/"}
         )
+        self.languages = get_languages()
 
     def _get_token(self):
         url = "https://www.zee5.com/"
@@ -37,7 +38,7 @@ class Zee5API:
                     "filter": {
                         "page": page,
                         "translation": "en",
-                        "languages": "en,hi,mr",
+                        "languages": self.languages,
                         "country": "IN",
                         "limit": 20,
                         "itemLimit": 5,
@@ -59,7 +60,7 @@ class Zee5API:
                         "page": 0,
                         "country": "IN",
                         "filters": {},
-                        "languages": "en,hi,mr",
+                        "languages": self.languages,
                         "translation": "en",
                     },
                 },

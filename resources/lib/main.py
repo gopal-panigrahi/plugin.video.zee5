@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from resources.lib.utils import update_query_params
+from resources.lib.utils import update_query_params, get_languages
 from resources.lib.constants import DEFAULT_PARAMS, DEVICE_ID, URLS, url_constructor
 from resources.lib.api import Zee5API
 from resources.lib.builder import Builder
@@ -105,13 +105,14 @@ def list_movies(_, **kwargs):
 
 @Resolver.register
 def play_video(_, **kwargs):
+    languages = get_languages()
     if "mediatype" in kwargs:
         queryParams = {
             "content_id": kwargs.get("item_id"),
             "device_id": DEVICE_ID,
             "platform_name": "desktop_web",
             "translation": "en",
-            "user_language": "en,hi,mr",
+            "user_language": languages,
             "country": "IN",
             "state": "MH",
             "app_version": "2.51.32",
