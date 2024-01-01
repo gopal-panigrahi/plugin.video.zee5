@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from resources.lib.utils import updateQueryParams
+from resources.lib.utils import update_query_params
 from resources.lib.constants import DEFAULT_PARAMS, DEVICE_ID, URLS, url_constructor
 from resources.lib.api import Zee5API
 from resources.lib.builder import Builder
@@ -13,16 +13,16 @@ import random, string
 @Route.register
 def root(_):
     yield Listitem.search(Route.ref("/resources/lib/main:list_search"), url="search")
-    yield from builder.buildMenu()
+    yield from builder.build_menu()
 
 
 @Route.register
 def list_collection(_, **kwargs):
     if "id" in kwargs:
-        page = api.getPage(kwargs.get("id"), kwargs.get("end") // 20)
+        page = api.get_page(kwargs.get("id"), kwargs.get("end") // 20)
         kwargs["total"] = page.get("totalResults")
-        yield from builder.buildCollection(page.get("rails"))
-        yield from builder.buildNext(**kwargs)
+        yield from builder.build_collection(page.get("rails"))
+        yield from builder.build_next(**kwargs)
     else:
         return False
 
@@ -31,8 +31,8 @@ def list_collection(_, **kwargs):
 def list_search(_, **kwargs):
     if kwargs.get("search_query", False):
         keyword = kwargs.get("search_query")
-        items = api.getSearchResult(keyword)
-        yield from builder.buildPage(items)
+        items = api.get_search_result(keyword)
+        yield from builder.build_page(items)
     else:
         yield False
 
@@ -40,10 +40,10 @@ def list_search(_, **kwargs):
 @Route.register
 def list_page(_, **kwargs):
     if "id" in kwargs:
-        page = api.getPage(kwargs.get("id"), kwargs.get("end") // 20)
+        page = api.get_page(kwargs.get("id"), kwargs.get("end") // 20)
         kwargs["total"] = page.get("totalResults")
-        yield from builder.buildPage(page.get("rails")[0].get("contents"))
-        yield from builder.buildNext(**kwargs)
+        yield from builder.build_page(page.get("rails")[0].get("contents"))
+        yield from builder.build_next(**kwargs)
     else:
         return False
 
@@ -52,8 +52,8 @@ def list_page(_, **kwargs):
 def list_seasons(_, **kwargs):
     if "item_id" in kwargs:
         url = f"tvshow/{kwargs.get('item_id')}"
-        seasons = api.getSeasons(url)
-        yield from builder.buildSeasons(seasons, kwargs.get("item_id"))
+        seasons = api.get_seasons(url)
+        yield from builder.build_seasons(seasons, kwargs.get("item_id"))
     else:
         yield False
 
@@ -65,7 +65,7 @@ def list_episodes(_, **kwargs):
         key = "episode"
         if page == 1:
             url = f"tvshow/{kwargs.get('show_id')}"
-            episodes = api.getSeasons(url)[0]
+            episodes = api.get_seasons(url)[0]
             key = "episodes"
         else:
             url = url_constructor(f"tvshow/")
@@ -78,11 +78,11 @@ def list_episodes(_, **kwargs):
                 "limit": "25",
             }
             queryParams.update(DEFAULT_PARAMS)
-            url = updateQueryParams(url, queryParams)
-            episodes = api.getEpisodes(url)
+            url = update_query_params(url, queryParams)
+            episodes = api.get_episodes(url)
 
         total_episodes = episodes.get("total_episodes")
-        yield from builder.buildEpisodes(episodes.get(key), kwargs.get("show_id"))
+        yield from builder.build_episodes(episodes.get(key), kwargs.get("show_id"))
         if page * 25 < total_episodes:
             yield Listitem.next_page(
                 **{
@@ -121,12 +121,12 @@ def play_video(_, **kwargs):
             "version": "12",
         }
         url = URLS.get("VIDEO")
-        url = updateQueryParams(url, queryParams)
+        url = update_query_params(url, queryParams)
         if kwargs.get("mediatype") != "movie":
-            url = updateQueryParams(url, {"show_id": kwargs.get("show_id")})
-        key_details, video_details = api.getVideo(url)
-        stream_headers = api._getPlayHeaders()
-        return builder.buildPlay(video_details, stream_headers, key_details)
+            url = update_query_params(url, {"show_id": kwargs.get("show_id")})
+        key_details, video_details = api.get_video(url)
+        stream_headers = api._get_play_headers()
+        return builder.build_play(video_details, stream_headers, key_details)
 
 
 @Script.register

@@ -12,7 +12,7 @@ def deep_get(dictionary, keys, default=None):
     )
 
 
-def updateQueryParams(url, params):
+def update_query_params(url, params):
     url_parts = list(urlparse(url))
     query = dict(parse_qsl(url_parts[4]))
     query.update(params)
@@ -22,19 +22,19 @@ def updateQueryParams(url, params):
 
 def get_images(item):
     url = f"https://akamaividz2.zee5.com/image/upload/resources/{deep_get(item, 'id')}"
-    thumb = getThumbnail(url, item.get("image"))
-    fanart = getPoster(url, item.get("image"))
+    thumb = get_thumbnail(url, item.get("image"))
+    fanart = get_poster(url, item.get("image"))
     return thumb, fanart
 
 
-def getThumbnail(url, item):
+def get_thumbnail(url, item):
     img = item.get("cover")
     if img:
         return f"{url}/portrait/{img}"
-    return getPoster(url, item)
+    return get_poster(url, item)
 
 
-def getPoster(url, item):
+def get_poster(url, item):
     images = [
         "list",
         "cover",
@@ -49,11 +49,11 @@ def getPoster(url, item):
     return None
 
 
-def get_deviceid():
+def get_device_id():
     return Settings.get_string("device_id")
 
 
-def isPremium(item):
+def is_premium(item):
     businessType = deep_get(item, "businessType")
     if "premium" in businessType or "tvod" in businessType:
         return "(Premium)"

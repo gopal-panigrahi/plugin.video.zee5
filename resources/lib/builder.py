@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from resources.lib.utils import get_images, callback_urls, deep_get, isPremium
+from resources.lib.utils import get_images, callback_urls, deep_get, is_premium
 from resources.lib.constants import MAIN_MENU
 from codequick import Listitem, Resolver, Route
 import inputstreamhelper
@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 
 
 class Builder:
-    def buildMenu(self):
+    def build_menu(self):
         for item_name, id, image in MAIN_MENU:
             item_data = {
                 "callback": Route.ref("/resources/lib/main:list_collection"),
@@ -19,7 +19,7 @@ class Builder:
             item.art.local_thumb(image)
             yield item
 
-    def buildCollection(self, items):
+    def build_collection(self, items):
         for each in items:
             if each.get("title") and "Banner" not in each.get("title"):
                 thumb, fanart = get_images(each.get("contents")[0])
@@ -31,9 +31,9 @@ class Builder:
                 }
                 yield Listitem.from_dict(**item_data)
 
-    def buildPage(self, items):
+    def build_page(self, items):
         for each in items:
-            premium = isPremium(each)
+            premium = is_premium(each)
             thumb, fanart = get_images(each)
             item_data = {
                 "callback": callback_urls.get(each.get("assetSubType")),
@@ -55,7 +55,7 @@ class Builder:
             }
             yield Listitem.from_dict(**item_data)
 
-    def buildSeasons(self, seasons, show_id):
+    def build_seasons(self, seasons, show_id):
         for each in seasons[::-1]:
             item_data = {
                 "callback": Route.ref("/resources/lib/main:list_episodes"),
@@ -70,13 +70,13 @@ class Builder:
             item.art.local_thumb("season.png")
             yield item
 
-    def buildNext(self, **kwargs):
+    def build_next(self, **kwargs):
         if kwargs.get("end") < kwargs.get("total"):
             kwargs["start"] += 20
             kwargs["end"] += 20
             yield Listitem().next_page(**kwargs)
 
-    def buildEpisodes(self, episodes, show_id):
+    def build_episodes(self, episodes, show_id):
         for each in episodes:
             if each.get("business_type").split("_")[0] not in ["premium"]:
                 thumb, fanart = get_images(each)
@@ -107,7 +107,7 @@ class Builder:
                 }
                 yield Listitem.from_dict(**item_data)
 
-    def buildPlay(self, video_details, stream_headers, key_details):
+    def build_play(self, video_details, stream_headers, key_details):
         video_urls = video_details.get("video_url")
         license_key = "|%s&Content-Type=application/octet-stream|R{SSM}|" % urlencode(
             stream_headers

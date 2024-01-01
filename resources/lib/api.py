@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from resources.lib.utils import updateQueryParams, deep_get
+from resources.lib.utils import update_query_params, deep_get
 import urlquick
 from resources.lib.constants import URLS, BASE_HEADERS, DEVICE_ID, url_constructor
 from codequick import Script
@@ -12,12 +12,12 @@ class Zee5API:
     def __init__(self):
         self.session = urlquick.Session()
         self.session.headers.update(BASE_HEADERS)
-        self.token = self._getToken()
+        self.token = self._get_token()
         self.session.headers.update(
             {"x-access-token": self.token, "Referer": "https://www.zee5.com/"}
         )
 
-    def _getToken(self):
+    def _get_token(self):
         url = "https://www.zee5.com/"
         resp = urlquick.get(url, headers=BASE_HEADERS)
         token = ""
@@ -28,7 +28,7 @@ class Zee5API:
                 token = t
         return token
 
-    def getPage(self, id, page):
+    def get_page(self, id, page):
         payload = json.dumps(
             {
                 "query": "\n  query ($id: ID!, $filter: CollectionFilter) {\n    collection(id: $id, filter: $filter) {\n      id\n      title\n      originalTitle\n      tags\n      rails {\n        id\n        title\n        originalTitle\n        tags\n        position\n        contents {\n          ... on Episode {\n            id\n            title\n            originalTitle\n            duration\n            upcomingContent\n            contentOwner\n            businessType\n            eventStartDate\n            genres {\n              id\n              value\n            }\n            languages\n            description\n            assetType\n            assetSubType\n            releaseDate\n            viewCount {\n              formattedCount\n              count\n            }\n            image {\n              list\n              cover\n              appCover\n              sticker\n              svodCover\n              verticalBanner\n              appSvodCover\n            }\n            actors\n            ageRating\n            audioLanguages\n            subtitleLanguages\n            eventLive\n            tags\n            episodeNumber\n            billingType\n            tier\n            seoTitle\n            slug\n            webUrl\n            rating\n            tvShow {\n              id\n              title\n              originalTitle\n              assetSubType\n            }\n            contentPartner {\n              id\n              name\n              image {\n                rectangleDarkLogo\n                rectangleWhiteLogo\n                circleDarkLogo\n                circleWhiteLogo\n              }\n            }\n          }\n          ... on Movie {\n            id\n            title\n            originalTitle\n            duration\n            contentOwner\n            businessType\n            genres {\n              id\n              value\n            }\n            languages\n            description\n            assetType\n            assetSubType\n            releaseDate\n            viewCount {\n              formattedCount\n              count\n            }\n            image {\n              list\n              cover\n              sticker\n              appCover\n              svodCover\n              verticalBanner\n              appSvodCover\n            }\n            actors\n            ageRating\n            audioLanguages\n            subtitleLanguages\n            eventLive\n            tags\n            billingType\n            tier\n            playDate\n            seoTitle\n            slug\n            webUrl\n            rating\n            relatedContentIds {\n              id\n            }\n            contentPartner {\n              id\n              name\n              image {\n                rectangleDarkLogo\n                rectangleWhiteLogo\n                circleDarkLogo\n                circleWhiteLogo\n              }\n            }\n          }\n        }\n        totalResults\n      }\n      page\n      size\n      totalResults\n    }\n  }\n",
@@ -48,7 +48,7 @@ class Zee5API:
         resp = self.post(URLS.get("PAGE"), data=payload)
         return deep_get(resp, "data.collection")
 
-    def getSearchResult(self, keyword):
+    def get_search_result(self, keyword):
         payload = json.dumps(
             {
                 "query": "\nquery ($searchQueryInput: SearchQueryInput!) {\n    searchResults(searchQueryInput: $searchQueryInput) {\n      __typename\n      totalPages\n      currentPageIndex\n      totalResultsCount\n      currentResultsCount\n      limit\n      version\n      queryId\n      results {\n        title\n        duration\n        businessType\n        originalTitle\n        assetSubType\n        isIndiaImageEnabled\n        releaseDate\n        contentType\n        primaryGenre\n        audioLanguages\n        id\n        billingType\n        listImage\n        coverImage\n        imageUrl\n        subtitleLanguages\n        image {\n          listClean\n          square\n          appCover\n          tvCover\n          cover\n          list\n          portraitClean\n          portrait\n        }\n        genre {\n          id\n          value\n        }\n        actors\n        tvShow {\n          id\n          title\n          originalTitle\n          assetSubType\n        }\n      }\n    }\n  }\n",
@@ -68,24 +68,24 @@ class Zee5API:
         resp = self.post(URLS.get("PAGE"), data=payload)
         return deep_get(resp, "data.searchResults.results")
 
-    def getCollection(self, url):
+    def get_collection(self, url):
         resp = self.get(url)
         collection = resp and resp.get("buckets")[0].get("items")
         total = resp and resp.get("total")
         return collection, total
 
-    def getSeasons(self, url):
+    def get_seasons(self, url):
         url = url_constructor(url)
-        url = updateQueryParams(url, {"translation": "en", "country": "IN"})
+        url = update_query_params(url, {"translation": "en", "country": "IN"})
         resp = self.get(url)
         return resp.get("seasons")
 
-    def getEpisodes(self, url):
+    def get_episodes(self, url):
         url = url_constructor(url)
         episodes = self.get(url)
         return episodes
 
-    def getVideo(self, url):
+    def get_video(self, url):
         payload = json.dumps(
             {"x-access-token": self.token, "X-Z5-Guest-Token": DEVICE_ID}
         )
@@ -128,6 +128,6 @@ class Zee5API:
     def _handleError(self, e, url, _rtype, **kwargs):
         Script.notify("Internal Error", "")
 
-    def _getPlayHeaders(self):
+    def _get_play_headers(self):
         stream_headers = self.session.headers
         return stream_headers

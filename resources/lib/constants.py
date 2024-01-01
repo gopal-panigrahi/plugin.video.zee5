@@ -1,4 +1,4 @@
-from resources.lib.utils import get_deviceid
+from resources.lib.utils import get_device_id
 from codequick.utils import urljoin_partial
 import xbmc
 
@@ -21,7 +21,7 @@ BASE_HEADERS = headers = {
 
 url_constructor = urljoin_partial(CONTENT_BASE_URL)
 
-DEVICE_ID = get_deviceid()
+DEVICE_ID = get_device_id()
 
 DEFAULT_PARAMS = {
     "country": "IN",
